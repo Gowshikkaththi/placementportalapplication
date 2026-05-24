@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register - Placement Portal</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+  background: linear-gradient(135deg,#6c63ff,#00c6ff);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+
+.card-register{
+  width:100%;
+  max-width:700px;
+  border-radius:15px;
+  padding:30px;
+  background:#fff;
+  box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+.form-control:focus{
+  box-shadow:0 0 5px rgba(108,99,255,0.5);
+  border-color:#6c63ff;
+}
+
+.required:after{
+  content:"*";
+  color:red;
+}
+
+@media (max-width:768px){
+.row-cols-md-2{
+flex-direction:column;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="card card-register">
+
+<h3 class="text-center mb-4">Register Account</h3>
+
+<!-- ROLE SELECT -->
+<div id="roleSelect">
+
+<div class="mb-3">
+<label class="form-label required">Role</label>
+
+<select class="form-select" id="role" onchange="showRoleForm()" required>
+<option value="">Select Role</option>
+<option value="STUDENT">Student</option>
+<option value="COMPANY">Company</option>
+</select>
+
+</div>
+</div>
+
+<form id="registerForm" style="display:none">
+
+<button type="button" class="btn btn-secondary mb-3" onclick="goBackRole()">← Back</button>
+
+<!-- STUDENT FORM -->
+<div id="studentFields" style="display:none">
+
+<div class="row row-cols-1 row-cols-md-2 g-3">
+
+<div class="col">
+<label class="form-label required">First Name</label>
+<input type="text" id="first_name" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label">Last Name</label>
+<input type="text" id="last_name" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label required">Roll Number</label>
+<input type="text" id="roll_number" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label required">Email</label>
+<input type="email" id="email" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label required">Phone</label>
+<input type="tel" id="phone" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label required">Department</label>
+<input type="text" id="department" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label required">Degree</label>
+<input type="text" id="degree" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label required">Batch Year</label>
+<input type="number" id="batch_year" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label">CGPA</label>
+<input type="number" id="cgpa" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label">Skills</label>
+<input type="text" id="skills" class="form-control">
+</div>
+
+</div>
+</div>
+
+<!-- COMPANY FORM -->
+<div id="companyFields" style="display:none">
+
+<div class="row row-cols-1 row-cols-md-2 g-3">
+
+<div class="col">
+<label class="form-label required">Company Name</label>
+<input type="text" id="company_name" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label required">Company Email</label>
+<input type="email" id="company_email" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label">Website</label>
+<input type="url" id="website" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label">Industry</label>
+<input type="text" id="industry" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label">Headquarters</label>
+<input type="text" id="headquarters" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label">Description</label>
+<textarea id="description" class="form-control"></textarea>
+</div>
+
+</div>
+</div>
+
+<!-- COMMON FIELDS -->
+<div class="row row-cols-1 row-cols-md-2 g-3 mt-3">
+
+<div class="col">
+<label class="form-label required">Username</label>
+<input type="text" id="username" class="form-control">
+</div>
+
+<div class="col">
+<label class="form-label required">Password</label>
+<input type="password" id="password" class="form-control">
+</div>
+
+</div>
+
+<button class="btn btn-success w-100 mt-4">Register</button>
+
+<div class="mt-3 text-center">
+Already have an account?
+<a href="{{ url_for('login') }}">Login</a>
+</div>
+
+</form>
+</div>
+
+<script>
+
+function showRoleForm(){
+
+let role=document.getElementById("role").value;
+
+document.getElementById("roleSelect").style.display="none";
+document.getElementById("registerForm").style.display="block";
+
+document.getElementById("studentFields").style.display =
+role==="STUDENT" ? "block":"none";
+
+document.getElementById("companyFields").style.display =
+role==="COMPANY" ? "block":"none";
+
+}
+
+function goBackRole(){
+
+document.getElementById("roleSelect").style.display="block";
+document.getElementById("registerForm").style.display="none";
+
+document.getElementById("studentFields").style.display="none";
+document.getElementById("companyFields").style.display="none";
+
+document.getElementById("role").value="";
+}
+
+document.getElementById("registerForm")
+.addEventListener("submit",async function(e){
+
+e.preventDefault();
+
+let role=document.getElementById("role").value;
+
+let data={
+username:document.getElementById("username").value,
+password:document.getElementById("password").value
+};
+
+let url="";
+
+if(role==="STUDENT"){
+
+url="/register/register_student";
+
+data.role="STUDENT";
+data.first_name=document.getElementById("first_name").value;
+data.last_name=document.getElementById("last_name").value;
+data.roll_number=document.getElementById("roll_number").value;
+data.email=document.getElementById("email").value;
+data.phone=document.getElementById("phone").value;
+data.department=document.getElementById("department").value;
+data.degree=document.getElementById("degree").value;
+data.batch_year=parseInt(document.getElementById("batch_year").value);
+data.cgpa=parseFloat(document.getElementById("cgpa").value||0);
+data.skills=document.getElementById("skills").value;
+
+}
+
+else if(role==="COMPANY"){
+
+url="/register/register_company";
+
+data.role="COMPANY";
+data.email=document.getElementById("company_email").value;
+data.company_name=document.getElementById("company_name").value;
+data.website=document.getElementById("website").value;
+data.description=document.getElementById("description").value;
+data.industry=document.getElementById("industry").value;
+data.headquarters=document.getElementById("headquarters").value;
+
+}
+
+try{
+
+const res=await fetch(url,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(data)
+});
+
+const result=await res.json();
+
+if(res.ok){
+
+alert(result.message || "Registration successful");
+window.location.href="{{ url_for('login') }}";
+
+}else{
+
+alert(result.message || "Registration failed");
+
+}
+
+}catch(err){
+
+alert("Server error");
+console.error(err);
+
+}
+
+});
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

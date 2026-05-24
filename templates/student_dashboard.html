@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body class="bg-light">
+
+<div class="container py-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h2>Student Dashboard</h2>
+
+<a href="/logout" class="btn btn-danger">Logout</a>
+
+</div>
+
+<ul class="nav nav-tabs">
+
+<li class="nav-item">
+<button class="nav-link active" data-bs-toggle="tab" data-bs-target="#drives">
+Available Drives
+</button>
+</li>
+
+<li class="nav-item">
+<button class="nav-link" data-bs-toggle="tab" data-bs-target="#applications">
+My Applications
+</button>
+</li>
+
+<li class="nav-item">
+<button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile">
+My Profile
+</button>
+</li>
+
+<li class="nav-item">
+<button class="nav-link" data-bs-toggle="tab" data-bs-target="#update">
+Update Profile
+</button>
+</li>
+
+</ul>
+
+<div class="tab-content mt-3">
+
+<!-- AVAILABLE DRIVES -->
+
+<div class="tab-pane fade show active" id="drives">
+
+<table class="table table-striped table-bordered">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Company</th>
+<th>Job Title</th>
+<th>Location</th>
+<th>Package</th>
+<th>Min CGPA</th>
+<th>Deadline</th>
+<th>Apply</th>
+</tr>
+</thead>
+
+<tbody id="drivesTable"></tbody>
+
+</table>
+
+</div>
+
+
+<!-- MY APPLICATIONS -->
+
+<div class="tab-pane fade" id="applications">
+
+<table class="table table-striped table-bordered">
+
+<thead>
+<tr>
+<th>Application ID</th>
+<th>Company</th>
+<th>Job</th>
+<th>Status</th>
+<th>Applied Date</th>
+</tr>
+</thead>
+
+<tbody id="applicationsTable"></tbody>
+
+</table>
+
+</div>
+
+
+<!-- PROFILE -->
+
+<div class="tab-pane fade" id="profile">
+
+<div class="card">
+<div class="card-body">
+<div id="profileData"></div>
+</div>
+</div>
+
+</div>
+
+
+<!-- UPDATE PROFILE -->
+
+<div class="tab-pane fade" id="update">
+
+<div class="card">
+<div class="card-body">
+
+<div class="row">
+
+<div class="col-md-6">
+<label>First Name</label>
+<input id="first_name" class="form-control">
+</div>
+
+<div class="col-md-6">
+<label>Last Name</label>
+<input id="last_name" class="form-control">
+</div>
+
+</div>
+
+<br>
+
+<div class="row">
+
+<div class="col-md-6">
+<label>Phone</label>
+<input id="phone" class="form-control">
+</div>
+
+<div class="col-md-6">
+<label>CGPA</label>
+<input id="cgpa" class="form-control">
+</div>
+
+</div>
+
+<br>
+
+<div class="row">
+
+<div class="col-md-6">
+<label>GitHub</label>
+<input id="github_url" class="form-control">
+</div>
+
+<div class="col-md-6">
+<label>LinkedIn</label>
+<input id="linkedin_url" class="form-control">
+</div>
+
+</div>
+
+<br>
+
+<div class="row">
+
+<div class="col-md-6">
+<label>Portfolio</label>
+<input id="portfolio_url" class="form-control">
+</div>
+
+<div class="col-md-6">
+<label>Leetcode Rating</label>
+<input id="leetcode_rating" class="form-control">
+</div>
+
+</div>
+
+<br>
+
+<textarea id="skills" class="form-control" placeholder="Skills"></textarea>
+
+<br>
+
+<button class="btn btn-success" onclick="updateProfile()">
+Update Profile
+</button>
+
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+const studentId = {{ student_id }}
+
+function loadDrives(){
+
+fetch(`/student/drives/${studentId}`)
+.then(res=>res.json())
+.then(data=>{
+
+let table=""
+
+data.forEach(d=>{
+
+table+=`
+
+<tr>
+
+<td>${d.id}</td>
+<td>${d.company_name || "-"}</td>
+
+<td>
+<b>${d.job_title}</b><br>
+<small>${d.job_description || ""}</small>
+</td>
+
+<td>${d.location || "-"}</td>
+
+<td>
+<span class="badge bg-success">
+${d.salary_package || "-"}
+</span>
+</td>
+
+<td>${d.minimum_CGPA || "-"}</td>
+<td>${d.application_deadline || "-"}</td>
+
+<td>
+
+<button class="btn btn-primary btn-sm"
+onclick="applyDrive(${d.id})">
+
+Apply
+
+</button>
+
+</td>
+
+</tr>
+
+`
+
+})
+
+document.getElementById("drivesTable").innerHTML=table
+
+})
+
+}
+
+function applyDrive(driveId){
+
+let notes = prompt("Enter notes (optional)")
+
+fetch("/student/apply",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+student_id:studentId,
+drive_id:driveId,
+notes:notes
+})
+
+})
+
+.then(res=>res.json())
+
+.then(data=>{
+
+if(data.error){
+alert(data.error)
+}else{
+alert("Application submitted")
+loadApplications()
+loadDrives()
+}
+
+})
+
+}
+
+function loadApplications(){
+
+fetch(`/student/${studentId}/applications`)
+.then(res=>res.json())
+.then(data=>{
+
+let table=""
+
+data.forEach(a=>{
+
+table+=`
+
+<tr>
+
+<td>${a.application_id}</td>
+<td>${a.drive.company_name}</td>
+<td>${a.drive.job_title}</td>
+<td>${a.application_status}</td>
+<td>${a.application_date}</td>
+
+</tr>
+
+`
+
+})
+
+document.getElementById("applicationsTable").innerHTML=table
+
+})
+
+}
+
+function loadProfile(){
+
+fetch(`/student/details/${studentId}`)
+.then(res=>res.json())
+.then(data=>{
+
+document.getElementById("profileData").innerHTML = `
+
+<b>Roll Number:</b> ${data.roll_number}<br>
+<b>Name:</b> ${data.first_name} ${data.last_name}<br>
+<b>Email:</b> ${data.email}<br>
+<b>Phone:</b> ${data.phone}<br>
+<b>Department:</b> ${data.department}<br>
+<b>Degree:</b> ${data.degree}<br>
+<b>Batch Year:</b> ${data.batch_year}<br>
+<b>CGPA:</b> ${data.cgpa}<br>
+<b>Placement Status:</b> ${data.placement_status}<br>
+<b>Skills:</b> ${data.skills}
+
+`
+
+document.getElementById("first_name").value = data.first_name || ""
+document.getElementById("last_name").value = data.last_name || ""
+document.getElementById("phone").value = data.phone || ""
+document.getElementById("cgpa").value = data.cgpa || ""
+document.getElementById("skills").value = data.skills || ""
+
+})
+
+}
+
+function updateProfile(){
+
+let data={
+
+first_name:document.getElementById("first_name").value,
+last_name:document.getElementById("last_name").value,
+phone:document.getElementById("phone").value,
+cgpa:document.getElementById("cgpa").value,
+skills:document.getElementById("skills").value,
+github_url:document.getElementById("github_url").value,
+linkedin_url:document.getElementById("linkedin_url").value,
+portfolio_url:document.getElementById("portfolio_url").value,
+leetcode_rating:document.getElementById("leetcode_rating").value
+
+}
+
+fetch(`/student/${studentId}`,{
+
+method:"PUT",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify(data)
+
+})
+
+.then(res=>res.json())
+.then(data=>{
+
+alert("Profile Updated Successfully")
+loadProfile()
+
+})
+
+}
+
+loadDrives()
+loadApplications()
+loadProfile()
+
+</script>
+
+</body>
+</html>
